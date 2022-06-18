@@ -9,7 +9,7 @@
 
 void test_printmaps(char map[height][width], int mines[height][width]); //列印地圖狀況
 void initial(char map[height][width], int mines[height][width], int mines_number); //創建地圖(介面,地圖狀況,地雷個數)
-void chain(char map[height][width], int mines[height][width], int row, int col, int Height, int Weight); //連鎖(介面,地圖狀況,選擇行,選擇列,地圖長,地圖寬)
+void chain(char map[height][width], int mines[height][width], int row, int col, int Height, int Weight); //連鎖、周圍地雷數(介面,地圖狀況,選擇行,選擇列,地圖長,地圖寬)
 
 int main(){
     char map[height][width] = {' '}; //使用者看到的介面

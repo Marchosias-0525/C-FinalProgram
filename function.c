@@ -3,17 +3,35 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+
 #define height 10
 #define width 10
 #define number 15
-
+#ifndef _COLOR_
+//顏色定義
+#define NONE         "\033[m"
+#define RED          "\033[0;32;31m"
+#define ORANGE       "\033[1;31m"
+#define GREEN        "\033[0;32;32m"
+#define LIGHT_GREEN  "\033[1;32m"
+#define BLUE         "\033[0;32;34m"
+#define LIGHT_BLUE   "\033[1;34m"
+#define DARY_GRAY    "\033[1;30m"
+#define CYAN         "\033[0;36m"
+#define LIGHT_CYAN   "\033[1;36m"
+#define PURPLE       "\033[0;35m"
+#define LIGHT_PURPLE "\033[1;35m"
+#define BROWN        "\033[0;33m"
+#define YELLOW       "\033[1;33m"
+#define LIGHT_GRAY   "\033[0;37m"
+#define WHITE        "\033[1;37m"
+#endif
 void test_printmaps(char map[height][width], int mines[height][width]); //列印地圖狀況
 void menu();
 void Game(int Height, int Width, int mines_number);
 void initial(char map[height][width], int mines[height][width], int mines_number); //創建地圖(介面,地圖狀況,地雷個數)
 void chain(char map[height][width], int mines[height][width], int row, int col, int Height, int Width); //連鎖(介面,地圖狀況,選擇行,選擇列,地圖長,地圖寬)
-void check(char map[height][width], int mines[height][width], int Height, int Width);
-int remain(char map[height][width], int Height, int Width);
+int remain(char map[height][width], int Height, int Width); //剩餘未開啟個數
 void printmap(char map[height][width], int Height, int Width);
 
 
@@ -22,8 +40,8 @@ int main(){
     int Height = height;
     int Width = width;
     int input = 0;
-    menu();
     do{
+        menu();
         printf("請輸入：");
         scanf("%d", &input);
         if(input == 1){
@@ -120,30 +138,36 @@ void chain(char map[height][width], int mines[height][width], int row, int col, 
         }
     }
     if(count == 0){
-        map[row][col] = '0';
-        if(row-1 >= 0 && map[row-1][col] == '*'){
+        map[row][col] = ' ';
+        if(row-1 >= 0 && map[row-1][col] == '*' && mines[row-1][col] == 0){
             chain(map, mines, row-1, col, Height, Width);
         }
-        if(row+1 < Height && map[row+1][col] == '*'){
+        if(row+1 < Height && map[row+1][col] == '*' && mines[row+1][col] == 0){
             chain(map, mines, row+1, col, Height, Width);
         }
-        if(col-1 >= 0 && map[row][col-1] == '*'){
+        if(col-1 >= 0 && map[row][col-1] == '*' && mines[row][col-1] == 0){
             chain(map, mines, row, col-1, Height, Width);
         }
-        if(col+1 >= 0 && map[row][col+1] == '*'){
+        if(col+1 >= 0 && map[row][col+1] == '*' && mines[row][col+1] == 0){
             chain(map, mines, row, col+1, Height, Width);
         }
+        if(col+1 >= 0 && row+1 < Height && map[row+1][col+1] == '*' && mines[row+1][col+1] == 0){
+            chain(map, mines, row+1, col+1, Height, Width);
+        }
+        if(col+1 >= 0 && row-1 >= 0 && map[row-1][col+1] == '*' && mines[row-1][col+1] == 0){
+            chain(map, mines, row-1, col+1, Height, Width);
+        }
+        if(col-1 >= 0 && row-1 >= 0 && map[row-1][col-1] == '*' && mines[row-1][col-1] == 0){
+            chain(map, mines, row-1, col-1, Height, Width);
+        }
+        if(col-1 >= 0 && row+1 < Height && map[row+1][col-1] == '*' && mines[row+1][col-1] == 0){
+            chain(map, mines, row+1, col-1, Height, Width);
+        }
+        
     }
     else{
         map[row][col] = '0' + count;
     }
-}
-void check(char map[height][width], int mines[height][width], int Height, int Width){
-    int row, col;
-    printf("輸入座標：");
-    scanf("%d%d", &row, &col);
-
-
 }
 int remain(char map[height][width], int Height, int Width){
     int count = 0 ;
@@ -162,10 +186,11 @@ void printmap(char map[height][width], int Height, int Width){
     for(int i=0 ; i <= Width ; i++){
         printf("——————");
     }
-    printf("—\n");
+    printf("\n");
 
     for(int i=0 ; i <= Width ; i++){
-        printf("| %3d ", i);
+        printf("|");
+        printf(GREEN" %3d "NONE,i);
     }
     printf("|\n");
     for(int i=0 ; i <Height ; i++){
@@ -176,10 +201,22 @@ void printmap(char map[height][width], int Height, int Width){
             }
         }
         printf("\n");
-        printf("| %3d ", i+1);
+        printf("|");
+        printf(GREEN" %3d "NONE,i+1);
         for(int j=0 ; j < Width ; j++){
             printf("|");
-            printf("  %c  ", map[i][j]);
+            char a = map[i][j];
+            if(a == '1')
+                printf(BLUE"  %c  "NONE, a);
+            else if(a == '2')
+                printf(LIGHT_PURPLE"  %c  "NONE, a);
+            else if(a == '3' || a == '4')
+                printf(ORANGE"  %c  "NONE,a);
+            else if(a >= '5')
+                printf(PURPLE"  %c  "NONE, a);
+            else
+                printf("  %c  ", a);
+            
         }
         printf("|\n");
     }
@@ -187,5 +224,5 @@ void printmap(char map[height][width], int Height, int Width){
     for(int i=0 ; i <= Width ; i++){
         printf("——————");
     }
-    printf("—");
+    printf("\n");
 }
